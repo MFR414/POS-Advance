@@ -21,16 +21,21 @@ RUN apt-get update \
         jpegoptim optipng pngquant gifsicle \
         vim \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd
+    && docker-php-ext-install pdo pdo_mysql gd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs=${NODE_VERSION}-1nodesource1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y nodejs=${NODE_VERSION}-1nodesource1
+
+# Install npm with custom prefix and permissions
+ENV NPM_CONFIG_PREFIX=/home/appuser/.npm-global
+ENV PATH=$PATH:/home/appuser/.npm-global/bin
+RUN npm install -g npm --unsafe-perm=true
 
 # Create a non-root user and group
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
@@ -42,12 +47,12 @@ WORKDIR $APP_DIR
 COPY package*.json ./
 
 # Install npm dependencies
-RUN npm install
+RUN npm install --unsafe-perm
 
 # Copy the rest of the application
 COPY . .
 
-# Set permissions
+# Set permissions for the application directory
 RUN chown -R appuser:appgroup $APP_DIR \
     && chmod -R 755 $APP_DIR
 

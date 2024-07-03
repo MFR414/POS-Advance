@@ -54,7 +54,8 @@ COPY . .
 
 # Set permissions for the application directory
 RUN chown -R appuser:appgroup $APP_DIR \
-    && chmod -R 755 $APP_DIR
+    && chmod -R 755 $APP_DIR \
+    && chown -R appuser:appgroup /home/appuser/.npm
 
 # Switch to the non-root user
 USER appuser

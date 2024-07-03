@@ -31,6 +31,11 @@ WORKDIR /var/www/html
 # Copy Laravel application files to container
 COPY . .
 
+# Switch to a non-root user (create one if needed)
+RUN addgroup -g 1001 appuser && \
+    adduser -D -u 1001 -G appuser appuser
+USER appuser
+
 # Install PHP dependencies using Composer
 RUN composer install --no-dev --optimize-autoloader
 

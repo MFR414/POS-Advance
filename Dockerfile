@@ -28,16 +28,30 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs=${NODE_VERSION}-1nodesource1
+    && apt-get install -y nodejs=${NODE_VERSION}-1nodesource1 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user and group
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+# Set the working directory
+WORKDIR $APP_DIR
+
+# Copy package.json and package-lock.json for npm install
+COPY package*.json ./
 
 # Install npm dependencies
-WORKDIR $APP_DIR
-COPY package*.json ./
 RUN npm install
 
-# Create a non-root user and switch to it
-RUN addgroup -S appgroup && adduser -S -G appgroup appuser
-RUN chown -R appuser:appgroup /var/www
+# Copy the rest of the application
+COPY . .
+
+# Set permissions
+RUN chown -R appuser:appgroup $APP_DIR \
+    && chmod -R 755 $APP_DIR
+
+# Switch to the non-root user
 USER appuser
 
 # Install PHP dependencies using Composer

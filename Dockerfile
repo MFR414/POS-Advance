@@ -9,31 +9,27 @@ ENV NODE_VERSION=18.19.0 \
 # Install system dependencies
 RUN apk update \
     && apk add --no-cache \
-        gnupg \
-        curl \
-        git \
-        zip \
-        unzip \
-        libpng-dev \
-        freetype-dev \
-        jpeg-dev \  # Corrected package name for libjpeg development headers
-        nodejs \
-        npm \
-        jpegoptim \
-        optipng \
-        pngquant \
-        gifsicle \
-        vim \
+        GNUPG \
+        CURL \
+        GIT \
+        ZIP \
+        UNZIP \
+        LIBPNG-DEV \
+        FREETYPE-DEV \
+        JPEG-DEV \  # Corrected package name for libjpeg development headers
+        NODEJS \
+        NPM \
+        JPEOPTIM \
+        OPTIPNG \
+        PNGQUANT \
+        GIFSICLE \
+        VIM \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd \
     && rm -rf /var/cache/apk/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | sh - \
-    && apk add --no-cache nodejs npm
 
 # Install npm with custom prefix and permissions
 ENV NPM_CONFIG_PREFIX=/home/appuser/.npm-global

@@ -1,5 +1,5 @@
-# Use PHP version 8.2 as base image
-FROM php:8.2-fpm
+# Use PHP version 8.2 Alpine as base image
+FROM php:8.2-fpm-alpine
 
 # Environment variables
 ENV NODE_VERSION=18.19.0 \
@@ -7,30 +7,33 @@ ENV NODE_VERSION=18.19.0 \
     APP_PORT="8000"
 
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apk update \
+    && apk add --no-cache \
         gnupg \
         curl \
         git \
         zip \
         unzip \
         libpng-dev \
-        libjpeg-dev \
-        libfreetype6-dev \
-        locales \
-        jpegoptim optipng pngquant gifsicle \
+        libjpeg \
+        freetype \
+        nodejs \
+        npm \
+        jpegoptim \
+        optipng \
+        pngquant \
+        gifsicle \
         vim \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/cache/apk/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs=${NODE_VERSION}-1nodesource1
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | sh - \
+    && apk add --no-cache nodejs npm
 
 # Install npm with custom prefix and permissions
 ENV NPM_CONFIG_PREFIX=/home/appuser/.npm-global
@@ -38,7 +41,7 @@ ENV PATH=$PATH:/home/appuser/.npm-global/bin
 RUN npm install -g npm --unsafe-perm=true
 
 # Create a non-root user and group
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+RUN addgroup -S appgroup && adduser -S -D -G appgroup appuser
 
 # Set the working directory
 WORKDIR $APP_DIR

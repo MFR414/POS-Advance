@@ -1,5 +1,5 @@
 # Use PHP version 8.2 Alpine as base image
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
 # Environment variables
 ENV NODE_VERSION=18.19.0 \

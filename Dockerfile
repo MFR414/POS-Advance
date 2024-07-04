@@ -4,7 +4,7 @@ FROM php:8.2-fpm
 # Environment variables
 ENV NODE_VERSION=18.19.0 \
     APP_DIR="/var/www/html" \
-    APP_PORT="8000"
+    APP_PORT=8000  # Ensure this is an integer
 
 # Install system dependencies
 RUN apt-get update \
@@ -81,4 +81,4 @@ RUN php artisan optimize
 EXPOSE $APP_PORT
 
 # Run the default command to start the web server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=$APP_PORT"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=${APP_PORT}"]

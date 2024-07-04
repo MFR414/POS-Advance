@@ -56,8 +56,9 @@ COPY . .
 RUN chown -R appuser:appgroup $APP_DIR \
     && chmod -R 755 $APP_DIR
 
-# Change the ownership of the npm cache directory
-RUN mkdir -p /home/appuser/.npm && chown -R appuser:appgroup /home/appuser/.npm
+# Change the ownership of the npm and Composer cache directories
+RUN mkdir -p /home/appuser/.npm && chown -R appuser:appgroup /home/appuser/.npm \
+    && mkdir -p /home/appuser/.composer && chown -R appuser:appgroup /home/appuser/.composer
 
 # Switch to the non-root user
 USER appuser
@@ -66,7 +67,7 @@ USER appuser
 RUN composer install --no-dev --optimize-autoloader
 
 # Install Node.js dependencies and build assets
-RUN npm install --unsafe-perm && npm run prod
+RUN npm run prod
 
 # Install Laravel Authentication Views and Spatie Role
 RUN composer require laravel/ui \

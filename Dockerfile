@@ -15,8 +15,8 @@ RUN apk update \
         zip \
         unzip \
         libpng-dev \
-        freetype-dev \  # Corrected package name for freetype
-        libjpeg-turbo-dev \  # Corrected package name for libjpeg
+        freetype-dev \
+        jpeg-dev \  # Corrected package name for libjpeg development headers
         nodejs \
         npm \
         jpegoptim \

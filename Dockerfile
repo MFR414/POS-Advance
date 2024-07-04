@@ -4,7 +4,7 @@ FROM php:8.2-fpm
 # Environment variables
 ENV NODE_VERSION=18.19.0 \
     APP_DIR="/var/www/html" \
-    APP_PORT=8000  # Ensure this is an integer
+    APP_PORT=8000
 
 # Install system dependencies
 RUN apt-get update \

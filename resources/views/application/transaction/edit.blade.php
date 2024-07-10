@@ -458,16 +458,28 @@
         var actual_price = item_price;
 
         if( item_name !== "" && item_quantity !== "" && item_quantity_unit !== "" && item_price !== ""){
-            var item = new Object();
-            item.product_id = product_id;
-            item.item_code = item_code;
-            item.item_name = item_name;
-            item.item_quantity = item_quantity;
-            item.item_quantity_unit = item_quantity_unit;
-            item.item_price = item_price;
-            item.disc_percent = disc_percent;
-            item.item_total_price = calculateTotalPriceItem(item_quantity * item_price, disc_percent);
-            console.log(item.product_id);
+            var existingItemIndex = items.findIndex(item => item.item_code === item_code);
+
+            if(existingItemIndex !== -1){
+                // Item already exists, update the quantity
+                items[existingItemIndex].item_quantity = parseInt(items[existingItemIndex].item_quantity) + parseInt(item_quantity);
+                items[existingItemIndex].item_total_price = calculateTotalPriceItem(items[existingItemIndex].item_quantity * items[existingItemIndex].item_price, items[existingItemIndex].disc_percent);
+                console.log("Item quantity updated successfully");
+
+                // Return the index of the existing item
+                return items[existingItemIndex];
+            } else {
+                var item = new Object();
+                item.product_id = product_id;
+                item.item_code = item_code;
+                item.item_name = item_name;
+                item.item_quantity = item_quantity;
+                item.item_quantity_unit = item_quantity_unit;
+                item.item_price = item_price;
+                item.disc_percent = disc_percent;
+                item.item_total_price = calculateTotalPriceItem(item_quantity * item_price, disc_percent);
+                console.log(item.product_id);
+            }
 
             return item;
         } else {
@@ -559,13 +571,19 @@
 
         $('#product-select').change(function() {
             const selectedOption = $(this).find('option:selected');
-            selectedProduct.id = $(this).val();
-            selectedProduct.code = selectedOption.data('code');
-            selectedProduct.name = selectedOption.data('name');
-            selectedProduct.price = selectedOption.data('price');
-            selectedProduct.uom = selectedOption.data('uom');
-            $('#item_price_formatted').val(formatToCurrency(selectedProduct.price));
-            $('#item_quantity_unit').val(selectedProduct.uom);
+            
+            if (selectedOption.length > 0) {
+                selectedProduct.id = selectedOption.val();
+                selectedProduct.code = selectedOption.data('code');
+                selectedProduct.name = selectedOption.data('name');
+                selectedProduct.price = selectedOption.data('price');
+                selectedProduct.uom = selectedOption.data('uom');
+
+                $('#item_price_formatted').val(formatToCurrency(selectedProduct.price));
+                $('#item_quantity_unit').val(selectedProduct.uom);
+            } else {
+                console.error("No selected option found");
+            }
         });
 
 

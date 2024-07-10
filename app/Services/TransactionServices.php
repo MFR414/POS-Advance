@@ -239,30 +239,120 @@ class TransactionServices
 		return $transaction;
 	}
 
-    function updateStockAfterTransaction($transactionDetail){
-
+    public function updateStockAfterTransaction($transaction)
+    {
+        $response = [
+            'success' => false,
+            'message' => '', 
+        ]; 
+    
+        $transactionWithDetails = Transaction::where('transaction_number', $transaction->transaction_number)->with('details')->first();
+        
+        if ($transactionWithDetails) {
+            $updateStock = DB::transaction(function () use ($transactionWithDetails) {
+                $errorUpdatingStockFromTransactionDetailsId = [];
+                
+                foreach ($transactionWithDetails->details as $item) {
+                    $product = Product::find($item->product_id);
+                    if ($product && $product->stock) {
+                        $stockAfter = $product->stock->quantity - $item->item_quantity;
+    
+                        // Check if stock card already exists
+                        $existingStockCard = StockProductsCard::where('product_id', $product->id)
+                            ->where('description', "update stock " . $product->id . " after payment transaction " . $transactionWithDetails->transaction_number)
+                            ->first();
+    
+                        if ($existingStockCard) {
+                            // Update existing stock card
+                            $existingStockCard->update([
+                                'quantity' => $item->item_quantity,
+                                'stock_before' => $product->stock->quantity,
+                                'stock_after' => $stockAfter,
+                                'uom' => $item->item_quantity_unit,
+                                'price' => $product->price,
+                                'is_executed' => false,
+                                'created_at' => Carbon::now(),
+                            ]);
+    
+                            // Update the detail record with the stock card ID
+                            $item->update(['stock_card_id' => $existingStockCard->id]);
+                        } else {
+                            // Create a new stock card
+                            $stockCard = StockProductsCard::create([
+                                'type' => 'pengeluaran',
+                                'quantity' => $item->item_quantity,
+                                'stock_before' => $product->stock->quantity,
+                                'stock_after' => $stockAfter,
+                                'uom' => $item->item_quantity_unit,
+                                'description' => "update stock " . $product->id . " after payment transaction " . $transactionWithDetails->transaction_number,
+                                'product_id' => $product->id,
+                                'price' => $product->price,
+                                'is_executed' => false,
+                                'created_at' => Carbon::now(),
+                            ]);
+    
+                            if ($stockCard) {
+                                // Update the detail record with the stock card ID
+                                $item->update(['stock_card_id' => $stockCard->id]);
+                            } else {
+                                $errorUpdatingStockFromTransactionDetailsId[] = $item->id;
+                            }
+                        }
+                    } else {
+                        $errorUpdatingStockFromTransactionDetailsId[] = $item->id;
+                    }
+                }
+    
+                if (count($errorUpdatingStockFromTransactionDetailsId) > 0) {
+                    return [
+                        'success' => false,
+                        'message' => 'Cannot create some stock cards for transaction ' . $transactionWithDetails->transaction_number . '!',
+                        'data' => $errorUpdatingStockFromTransactionDetailsId,
+                    ];
+                }
+    
+                return [
+                    'success' => true,
+                    'message' => 'Success creating stock card!',
+                ];
+            });
+    
+            return $updateStock;
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Cannot find transaction with transaction number ' . $transaction->transaction_number . '!',
+            ];
+        }
     }
 
-	function updateTransactionAfterpayment($request, $transaction){
+    function updateTransactionAfterpayment($request, $transaction)
+    {
+        $payment = DB::transaction(function () use ($request,$transaction) {
+            if ($request->payment_type == "Cash") {
+                $transaction->transaction_status = "Sudah Dibayar";
+                $transaction->other_fees = (int) $request->other_fees ?: 0;
+                $transaction->return = (int) $request->change ?: 0;
+                $transaction->dp_po = (int) $request->dp_po ?: 0;
+                $transaction->cash = (int) $request->cash ?: 0;
+                $transaction->tax_percentage = (float) $request->tax_percentage ?: 0;
+                $transaction->tax_total = (int) $request->tax_total ?: 0;
+                $transaction->payment_type = $request->payment_type;
+                $transaction->final_total_after_additional = (int) $request->final_after_tax_total ?: 0;
+            } 
+            $updateStock = $this->updateStockAfterTransaction($transaction);
+            if(!$updateStock['success']){
+                throw new \Exception($updateStock['message']);
+            }
+            $transaction->save();
 
-		$payment = DB::transaction(function () use ($request,$transaction){
-			if($request->payment_type == "Cash"){
-				$transaction->transaction_status = "Sudah Dibayar";
-				$transaction->other_fees = (int) $request->other_fees;
-				$transaction->return = (int) $request->change;
-				$transaction->dp_po = (int) $request->dp_po;
-				$transaction->cash = (int) $request->cash;
-				$transaction->tax_percentage = (float) $request->tax_percentage;
-				$transaction->tax_total = (int) $request->tax_total;
-				$transaction->payment_type = $request->payment_type;
-				$transaction->final_total_after_additional = (int) $request->final_after_tax_total;
-			} 
-			$transaction->save();
+            return $updateStock;
+        });
 
-			return $transaction;
-		});
-
-
-		return $payment;
-	}
+        if($payment['success']){
+            return $payment;
+        } else {
+            throw new \Exception($payment['message']);
+        }
+    }
 }

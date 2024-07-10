@@ -23,6 +23,7 @@ class Product extends Model
         'price',
         'description',
         'uom',
+        'is_active',
     ];
 
     /**

@@ -165,7 +165,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the sales that owns the Transaction
+     * Get the details that owned by Transaction
      */
     public function details()
     {

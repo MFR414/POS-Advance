@@ -186,37 +186,36 @@ class TransactionController extends Controller
         ];
 
         $response = [
-			'success' => 'false',
-			'message' => '', 
-		];
+            'success' => false,
+            'message' => '', 
+        ];
 
-        $this->validate($request,$validation_rules);
+        $this->validate($request, $validation_rules);
 
-        // dd($request->all());
+        $transaction = Transaction::where('transaction_number', $request->transaction_number)->first();
 
-        $transaction = Transaction::where('transaction_number',$request->transaction_number)->first();
-        if(empty($transaction)){
-            $response['success'] = 'false';
+        if ($transaction === null) {
             $response['message'] = 'Maaf, kami tidak menemukan transaksi tersebut. Mohon coba beberapa saat lagi. Jika kesalahan masih berlanjut, silakan hubungi administrator kami.';
         } else { 
             $transactionServices = new TransactionServices();
-            $payment = $transactionServices->updateTransactionAfterpayment($request,$transaction);
+            $payment = $transactionServices->updateTransactionAfterpayment($request, $transaction);
 
-            if(!empty($payment)){
-                $response['success'] = 'true';
-                $response['message'] = 'Transaksi '.$transaction->transaction_number.' telah dibayar. terima kasih';
+            if ($payment['success']) {
+                $response['success'] = true;
+                $response['message'] = 'Transaksi '.$transaction->transaction_number.' telah dibayar. Terima kasih';
+            } else {
+                $response['message'] = 'Terjadi kesalahan saat melakukan pembayaran. Silakan coba lagi atau hubungi administrator kami.';
             }
         }
 
-        if($payment['success'] == 'true') {
+        if ($response['success']) {
             return redirect()
-            ->route('application.transactions.index')
-            ->with('success_message', $payment['message']);
+                ->route('application.transactions.index')
+                ->with('success_message', $response['message']);
         } else {
             return redirect()
-            ->route('application.transactions.index')
-            ->with('error_message', $payment['message']);
+                ->route('application.transactions.index')
+                ->with('error_message', $response['message']);
         }
-
     }
 }

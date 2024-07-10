@@ -26,6 +26,7 @@ class TransactionDetail extends Model
         'item_total_price',
         'disc_percent',
         'product_id',
+        'stock_card_id',
     ];
 
     /**

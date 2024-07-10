@@ -332,27 +332,33 @@
         const discPercent = document.getElementById("disc_percent").value;
 
         if (selectedProduct.name && itemQuantity && selectedProduct.uom && selectedProduct.price) {
-            const item = {
-                product_id: selectedProduct.id,
-                item_code: selectedProduct.code,
-                item_name: selectedProduct.name,
-                item_quantity: itemQuantity,
-                item_quantity_unit: selectedProduct.uom,
-                disc_percent: discPercent,
-                item_price: selectedProduct.price,
-                item_total_price: calculateTotalPriceItem(itemQuantity * selectedProduct.price, discPercent)
-            };
+            const existingItemIndex = items.findIndex(item => item.product_id === selectedProduct.id);
 
-            // Assuming `items` is an array declared globally or in an appropriate scope
-            items.push(item);
+            if (existingItemIndex !== -1) {
+                // Jika item sudah ada, tambahkan quantity
+                items[existingItemIndex].item_quantity = parseInt(items[existingItemIndex].item_quantity) + parseInt(itemQuantity);
+                items[existingItemIndex].item_total_price = calculateTotalPriceItem(items[existingItemIndex].item_quantity * selectedProduct.price, discPercent);
+            } else {
+                // Jika item belum ada, tambahkan item baru ke array
+                const item = {
+                    product_id: selectedProduct.id,
+                    item_code: selectedProduct.code,
+                    item_name: selectedProduct.name,
+                    item_quantity: itemQuantity,
+                    item_quantity_unit: selectedProduct.uom,
+                    disc_percent: discPercent,
+                    item_price: selectedProduct.price,
+                    item_total_price: calculateTotalPriceItem(itemQuantity * selectedProduct.price, discPercent)
+                };
+                items.push(item);
+            }
+
             console.log(items);
             refreshTable();
-
             resetFormFields();
         } else {
             alert('Mohon isi semua kolom dengan tanda ( * ) terlebih dahulu');
         }
-
     }
 
     function refreshTable(type = null, index = null){

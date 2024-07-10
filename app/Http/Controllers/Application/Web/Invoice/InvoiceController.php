@@ -39,7 +39,7 @@ class InvoiceController extends Controller
 
                 // convert into PDF format
                 $pdf = PDF::loadView('application.invoice.invoice-layout', ['data' => $transaction])
-                        ->setPaper([0, 0, 684, 792], 'landscape');
+                        ->setPaper([0, 0, 684, 792], 'potrait');
         
                 // Define the file name dynamically (e.g., using an order number)
                 $fileName = 'invoice_' . $transaction->transaction_number . '.pdf';

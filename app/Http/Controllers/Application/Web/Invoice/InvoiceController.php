@@ -109,6 +109,15 @@ class InvoiceController extends Controller
         }
     }
 
+    // /**
+    //  * generate receipt 
+    //  */
+    // public function generateReceipt(string $id){
+    //     $transaction = Transaction::find($id);
+
+
+    // }
+
     /**
      * Download invoice
      */

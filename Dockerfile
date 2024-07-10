@@ -66,9 +66,6 @@ USER appuser
 # Install PHP dependencies using Composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Install Node.js dependencies and build assets
-RUN npm run prod
-
 # Install Laravel Authentication Views and Spatie Role
 RUN composer require laravel/ui \
     && php artisan ui bootstrap --auth \
@@ -76,6 +73,12 @@ RUN composer require laravel/ui \
 
 # Optimize Laravel application
 RUN php artisan optimize
+
+# Remove node_modules directory after the build process
+RUN rm -rf node_modules
+
+# Rebuild npm dependencies with production settings
+RUN npm ci --production
 
 # Expose the port used by the Laravel application
 EXPOSE $APP_PORT

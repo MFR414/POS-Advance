@@ -162,7 +162,7 @@
                                         </a>
                                         @if(!empty($transaction->invoice_filename))
                                             <a class="btn btn-success btn-sm" style="padding-top: 8px;" href="{{ route('application.invoices.download', $transaction)}}">
-                                                <i class="fas fa-print"></i> Download Invoice
+                                                <i class="fas fa-download"></i> Download Invoice
                                             </a>
                                         @endif
                                     @endif

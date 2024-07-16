@@ -37,6 +37,7 @@ return new class extends Migration
             $table->bigInteger('final_total_after_additional')->nullable();
             $table->string('creator', 100)->nullable();
             $table->string('invoice_filename', 150)->nullable();
+            $table->string('receipt_filename', 150)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

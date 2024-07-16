@@ -157,13 +157,23 @@
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
                                     @else
-                                        <a class="btn btn-info btn-sm" style="padding-top: 8px;" href="{{ route('application.invoices.generate', $transaction)}}">
-                                            <i class="fas fa-print"></i> Pembuatan Invoice
+                                        <a class="btn btn-info btn-sm" style="padding-top: 8px;" href="{{ route('application.receipts.generate', $transaction)}}">
+                                            <i class="fas fa-print"></i> Pembuatan Struk
                                         </a>
-                                        @if(!empty($transaction->invoice_filename))
-                                            <a class="btn btn-success btn-sm" style="padding-top: 8px;" href="{{ route('application.invoices.download', $transaction)}}">
-                                                <i class="fas fa-download"></i> Download Invoice
+                                        @if(!empty($transaction->receipt_filename))
+                                            <a class="btn btn-success btn-sm" style="padding-top: 8px;" href="{{ route('application.receipts.download', $transaction)}}">
+                                                <i class="fas fa-download"></i> Download Struk
                                             </a>
+                                        @endif
+                                        @if (auth()->user()->hasAnyRole(['Admin','Super Admin','Owner User']))
+                                            <a class="btn btn-info btn-sm" style="padding-top: 8px;" href="{{ route('application.invoices.generate', $transaction)}}">
+                                                <i class="fas fa-print"></i> Pembuatan Invoice
+                                            </a>
+                                            @if(!empty($transaction->invoice_filename))
+                                                <a class="btn btn-success btn-sm" style="padding-top: 8px;" href="{{ route('application.invoices.download', $transaction)}}">
+                                                    <i class="fas fa-download"></i> Download Invoice
+                                                </a>
+                                            @endif
                                         @endif
                                     @endif
 

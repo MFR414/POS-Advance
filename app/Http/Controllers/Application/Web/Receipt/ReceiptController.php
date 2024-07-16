@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Application\Web\Invoice;
+namespace App\Http\Controllers\Application\Web\Receipt;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
@@ -11,12 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use PDF, DB;
 
-class InvoiceController extends Controller
+class ReceiptController extends Controller
 {
-    /**
-     * Generate invoice
+   /**
+     * Generate receipt
      */
-    public function generateInvoice(string $id)
+    public function generateReceipt(string $id)
     {
         $transaction = Transaction::find($id);
         
@@ -33,18 +33,20 @@ class InvoiceController extends Controller
                 $transaction->customer_address = ucwords($transaction->customer_address);
                 $transaction->creator = strtoupper($transaction->creator);
 
-                $transactionServices = new TransactionServices();
-                $transaction->terbilang = $transactionServices->generatePenyebut($transaction->final_total_after_additional);
+                // $transactionServices = new TransactionServices();
+                // $transaction->terbilang = $transactionServices->generatePenyebut($transaction->final_total_after_additional);
 
                 // convert into PDF format
-                $pdf = PDF::loadView('application.invoice.invoice-layout', ['data' => $transaction])
-                        ->setPaper([0, 0, 684, 792], 'potrait');
+                $pdf = PDF::loadView('application.receipt.receipt-layout', ['data' => $transaction])
+                      ->setPaper([0, 0, 84.65, 164.41], 'portrait');// 30mm x 58mm in points
+                // $pdf = PDF::loadView('application.receipt.receipt-layout', ['data' => $transaction])
+                //         ->setPaper([0, 0, 164.41, 85.04], 'landscape');
         
                 // Define the file name dynamically (e.g., using an order number)
-                $fileName = 'invoice_' . $transaction->transaction_number . '.pdf';
+                $fileName = 'receipts_' . $transaction->transaction_number . '.pdf';
 
                // Directory path
-                $directoryPath = public_path('invoices');
+                $directoryPath = public_path('receipts');
 
                 // Ensure the invoices directory exists within the public directory
                 if (!File::exists($directoryPath)) {
@@ -52,7 +54,7 @@ class InvoiceController extends Controller
                 }
 
                 // File path
-                $filePath = public_path('invoices/' . $fileName);
+                $filePath = public_path('receipts/' . $fileName);
 
                 // Check if the file exists
                 if (File::exists($filePath)) {
@@ -66,18 +68,18 @@ class InvoiceController extends Controller
                 if ($saved) {
                     $updateTransaction = DB::transaction(function () use ($transaction, $fileName){
                         $updateTransaction = Transaction::find($transaction->id);
-                        $updateTransaction->invoice_filename = $fileName;
+                        $updateTransaction->receipt_filename = $fileName;
                         $updateTransaction->save();
                         return $updateTransaction;
                     });
-                    if(!empty($updateTransaction->invoice_filename)){
+                    if(!empty($updateTransaction->receipt_filename)){
                         return redirect()
                         ->back()
-                        ->with('success_message', 'Invoice nomor '.$transaction->transaction_number.' berhasil dibuat.');
+                        ->with('success_message', 'Struk nomor '.$transaction->transaction_number.' berhasil dibuat.');
                     } else {
                         return redirect()
                         ->back()
-                        ->with('error_message', 'Kesalahan dalam pembuatan invoice, Silahkan coba lagi dalam beberapa saat atau hubungi admin');
+                        ->with('error_message', 'Kesalahan dalam pembuatan struk, Silahkan coba lagi dalam beberapa saat atau hubungi admin');
                     }
                 } else {
                     return redirect()
@@ -109,11 +111,11 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Download invoice
+     * Download receipt
      */
-    public function downloadInvoice(string $id){
+    public function downloadReceipt(string $id){
         $transaction = Transaction::find($id);
-        $filePath =   $filePath = public_path('invoices/' . $transaction->invoice_filename);
+        $filePath =   $filePath = public_path('receipts/' . $transaction->receipt_filename);
 
         // Check if the file exists
         if (File::exists($filePath)){
@@ -127,10 +129,10 @@ class InvoiceController extends Controller
     }
 
     /**
-     * check layout invoice
+     * check layout receipt
      */
 
-    public function checkInvoicelayout(string $id){
+    public function checkReceiptlayout(string $id){
         $transaction = Transaction::find($id);
         $transactionDetails = TransactionDetail::where('transaction_number', $transaction->transaction_number)->get();
         $transaction->items = $transactionDetails;
@@ -145,6 +147,6 @@ class InvoiceController extends Controller
         $transaction->terbilang = $transactionServices->generatePenyebut($transaction->final_total_after_additional);
         // dd($transaction);
         
-        return view('application.invoice.invoice-layout', ['data' => $transaction]);
+        return view('application.receipt.receipt-layout', ['data' => $transaction]);
     }
 }

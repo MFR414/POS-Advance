@@ -42,5 +42,8 @@ Route::middleware('auth')->prefix('application')->name('application.')->group(fu
 
     //receipt route
     require_once(__DIR__ . '/web/application/receipt.php');
+
+    //setting route
+    require_once(__DIR__ . '/web/application/setting.php');
 });
 

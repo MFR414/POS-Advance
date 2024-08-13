@@ -60,7 +60,7 @@
                                 <h3 class="title">Cari transaksi</h3>
                             </div>
                             <section>
-                                <form action="{{ route('application.reports.index') }}" method="GET" style="margin-bottom: 0">
+                                <form action="{{ route('application.reports.transactions.index') }}" method="GET" style="margin-bottom: 0">
                                     <div class="row">
                                         {{-- <div class="col-sm-12 col-md-3">
                                             <div class="form-group" style='margin-bottom: 0'>
@@ -247,7 +247,7 @@
             var year = $('#year').val();
 
             // Construct the export URL with the selected values
-            var exportUrl = "{{ route('application.reports.export') }}?month=" + month + "&year=" + year;
+            var exportUrl = "{{ route('application.reports.transactions.export') }}?month=" + month + "&year=" + year;
 
             // Redirect to the export URL
             window.location.href = exportUrl;

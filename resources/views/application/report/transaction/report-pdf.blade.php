@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Transaction Report</title>
+    <title>Laporan Transaksi</title>
     <style>
         table {
             width: 100%;

@@ -9,7 +9,7 @@ use DateTime;
 use Illuminate\Http\Request;
 use PDF;
 
-class ReportController extends Controller
+class TransactionReportController extends Controller
 {
     public function index(Request $request){
         // Get the current month and year
@@ -48,8 +48,9 @@ class ReportController extends Controller
             $transaction->details = $transactionDetails;
         }
 
-        return view('application.report.index', [
-            'active_page' => 'report',
+        return view('application.report.transaction.index', [
+            'active_page' => 'reports',
+            'active_subpage' => 'transactions',
             'transactions' => $transactions,
             'search_terms' => $search_terms
         ]);
@@ -103,7 +104,7 @@ class ReportController extends Controller
         ];
 
         // Load view and pass data to it
-        $pdf = PDF::loadView('application.report.report-pdf', $data);
+        $pdf = PDF::loadView('application.report.transaction.report-pdf', $data);
 
 
         // Download the PDF file

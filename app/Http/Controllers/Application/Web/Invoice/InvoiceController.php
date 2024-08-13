@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Application\Web\Invoice;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Services\TransactionServices;
@@ -18,6 +19,13 @@ class InvoiceController extends Controller
      */
     public function generateInvoice(string $id)
     {
+        $setting = Setting::orderBy('id', 'desc')->first();
+        if(empty($setting)) {
+            return redirect()
+                    ->back()
+                    ->with('error_message', 'Kesalahan saat memproses data toko, Silahkan isi data toko terlebih dahulu pada menu settings dan coba lagi dalam beberapa saat atau hubungi admin');
+        }
+
         $transaction = Transaction::find($id);
         
         if(!empty($transaction)){
@@ -37,7 +45,7 @@ class InvoiceController extends Controller
                 $transaction->terbilang = $transactionServices->generatePenyebut($transaction->final_total_after_additional);
 
                 // convert into PDF format
-                $pdf = PDF::loadView('application.invoice.invoice-layout', ['data' => $transaction])
+                $pdf = PDF::loadView('application.invoice.invoice-layout', ['data' => $transaction,'setting' => $setting])
                         ->setPaper([0, 0, 684, 792], 'potrait');
         
                 // Define the file name dynamically (e.g., using an order number)

@@ -103,7 +103,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <span id="company">TIGA WARNA Digital Printing</span>
+                            <span id="company">{{ $setting->store_name }}</span>
                         </td>
                         <td>
                             <span>Tanggal : {{ $data->formatted_create_date }}</span>
@@ -114,7 +114,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <span>JALAN SULTAN AGUNG 52 KEPANJEN</span>
+                            <span>{{ $setting->store_address }}</span>
                         </td>
                         <td>
                             <span>Kode Sales : {{ $data->sales_code}}</span>
@@ -124,7 +124,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <span> 0341 3904542 / 082132418501</span>
+                            <span> {{ $setting->store_phone_number_one }} / {{ $setting->store_phone_number_two }}</span>
                         </td>
                         <td>
                             <span> Pelanggan : {{ $data->customer_name}}</span>

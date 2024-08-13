@@ -66,12 +66,26 @@
               </li>
               
             @if( auth()->user()->hasAnyRole(['Admin','Super Admin','Owner User']))
-                <li class="nav-item">
-                  <a href="{{ route('application.reports.index') }}" class="nav-link {{ ( !empty($active_page) && $active_page == 'reports') ? 'active' : '' }}"">
-                    <i class="nav-icon fa fa-book"></i>
-                    <p>Laporan</p>
-                  </a>
-                </li>
+                <li class="nav-item {{ ( !empty($active_page) && $active_page == 'reports') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ ( !empty($active_page) && $active_page == 'reports') ? 'active' : '' }}"">
+                        <i class="nav-icon fa fa-book"></i><p>Laporan</p>
+                        <p>
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                      <li class="nav-item">
+                          <a class="nav-link {{ ( !empty($active_subpage) && $active_subpage == 'transactions') ? 'active' : '' }}" href="{{ route('application.reports.transactions.index') }}">
+                              <p>Transaksi</p>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link {{ ( !empty($active_subpage) && $active_subpage == 'stocks') ? 'active' : '' }}" href="{{ route('application.reports.stocks.index') }}">
+                              <p>Stock Opname</p>
+                          </a>
+                      </li>
+                    </ul>
+                <li>
                 <li class="nav-item {{ ( !empty($active_page) && $active_page == 'users') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ ( !empty($active_page) && $active_page == 'users') ? 'active' : '' }}"">
                         <i class="nav-icon fa fa-list"></i><p>Daftar Pengguna</p>
@@ -92,6 +106,12 @@
                       </li>
                     </ul>
                 <li>
+                <li class="nav-item">
+                  <a href="{{ route('application.settings.index') }}" class="nav-link {{ ( !empty($active_page) && $active_page == 'settings') ? 'active' : '' }}">
+                      <i class="nav-icon fas fa-toolbox"></i>
+                      <p>Setting</p>
+                  </a>
+                </li>
             @endif
 
             <li class="nav-item">

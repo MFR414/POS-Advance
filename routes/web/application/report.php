@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Application\Web\Report\ReportController;
+use App\Http\Controllers\Application\Web\Report\StockReportController;
+use App\Http\Controllers\Application\Web\Report\TransactionReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,8 +17,14 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('reports')->name('reports.')->group(function () {
-    Route::get('/', [ReportController::class,'index'])->name('index');
-    Route::get('/export', [ReportController::class,'generateReport'])->name('export');
-    Route::get('/{report}', [ReportController::class,'detail'])->name('show');
-
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('/', [TransactionReportController::class,'index'])->name('index');
+        Route::get('/export', [TransactionReportController::class,'generateReport'])->name('export');
+        Route::get('/{report}', [TransactionReportController::class,'detail'])->name('show');
+    });
+    Route::prefix('stocks')->name('stocks.')->group(function () {
+        Route::get('/', [StockReportController::class,'index'])->name('index');
+        Route::get('/export', [StockReportController::class,'generateReport'])->name('export');
+        Route::get('/{product_id}', [StockReportController::class,'history'])->name('show');
+    });
 });

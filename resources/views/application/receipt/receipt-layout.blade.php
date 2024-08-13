@@ -97,9 +97,9 @@
 <body>
     <div class="receipt">
         <div class="header-container">
-            <h1>Toko ABC</h1>
-            <p>Jl. Jendral Sudirman No. 1</p>
-            <p>Telp: (021) 12345678</p>
+            <h1>{{ $setting->store_name }}</h1>
+            <p>{{ $setting->store_address }}</p>
+            <p>{{ $setting->store_phone_number_one }} / {{ $setting->store_phone_number_two }}</p>
             <hr>
             <div class="details">
                 <table>
